@@ -1,6 +1,6 @@
 
 //Put here all your setup
-int state=1;
+int state=0;
 
 void loop() {
   switch(state){
@@ -8,32 +8,33 @@ void loop() {
     case 1:
       joy();
       state ++;
-      break;
       delay(3000);
+      break;
       
     case 2:
       sadness();
       state ++;
-      break;
       delay(3000);
+      break;
 
     case 3:
       anger();
       state ++;
-      break;
       delay(3000);
+      break;
 
     case 4:
       fear();
       state++;
-      break;
       delay(3000);
+      break;
 
     case 5:
        disgust();
        state++;
-       break;
        delay(3000);
+       break;
+
 
     default:
         state = 1;
@@ -45,6 +46,7 @@ void loop() {
 void joy(){
   for(int i=0; i<10; i++){
     servo_joy();
+    play();
   }
 }
 
