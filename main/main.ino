@@ -1,101 +1,47 @@
+#include "myServo.h"
+#include "Motor.h"
+#include "led.h"
+#include "sonar.h"
+#include "controller.h"
 
-//Put here all your setup
-int state=1;
+MyServo* servo1 = new MyServo();
+MyServo* servo2 = new MyServo();
+MyServo* servo3 = new MyServo();
+Motor* motor1 = new Motor();
+Motor* motor2 = new Motor();
+Led* led = new Led();
+Sonar* sonar = new Sonar();
+
+MyServo * servoPtrs[3] = {servo1, servo2, servo3};
+Motor* motorPtrs[2] = {motor1, motor2};
+
+Controller controller(servoPtrs, motorPtrs, led, sonar);
 
 void setup(){
-  setup_servo();
-  setup_wheels();
+  attachInterrupt(digitalPinToInterrupt(21), changeEmotion, RISING);
+  servo1->Attach(6);
+  servo2->Attach(7);
+  servo3->Attach(8);
+  motor1->setup(24, 22, 11);
+  motor2->setup(23, 25, 12);
+  led->configure(2,3,5);
+  //sonar->setup(9,10);
+  Serial.begin(9600);
 }
 
-void loop() {
-  switch(state){
-    //joy
-    case 1:
-      joy();
-      state =1;
-      delay(3000);
-      break;
-      
-    case 2:
-      sadness();
-      state ++;
-      delay(3000);
-      Serial.println("stop joy");
-      Serial.println("       ");
-      break;
-
-    case 3:
-      anger();
-      state ++;
-      delay(3000);
-      break;
-
-    case 4:
-      fear();
-      state++;
-      delay(3000);
-      break;
-
-    case 5:
-       disgust();
-       state++;
-       delay(3000);
-       break;
-
-
-    default:
-        state = 1;
-        neutral();
-  }
-  
+void loop(){
+  controller.updateEmotion(millis());
 }
 
-void joy(){
-  for(int j=0; j<10; j++){
-      wheels_disgust();
-      servo_joy();
-  }
-  
-}
+int emotion = 0;
+long lastDebounceTime = 0; 
+long debounceDelay = 500; 
 
-void sadness(){
-  for(int i=0; i<1; i++){
-    servo_sadness();
-    Serial.print("sadness");
+void changeEmotion(){
+  if ((millis() - lastDebounceTime) > debounceDelay){
+    Serial.println("BUTTON PRESSED ");
+    Serial.println("               ");
+    lastDebounceTime = millis();
+	  controller.changeEmotion();
   }
 }
-
-void anger(){
-  for(int i=0; i<1; i++){
-    Serial.print("anger");
-    servo_anger();
-  } 
-}
-
-void fear(){
-  for(int i=0; i<10; i++){
-    wheels_fear();
-  }
-  Serial.print("fear");
-  motor1stop();
-  motor2stop();
-}
-void disgust(){
-  for(int i=0; i<10; i++){
-    wheels_disgust();
-    Serial.print("bleah");
-  }
-  motor1stop();
-  motor2stop();
-}
-void neutral(){
-  //servo_reset();
-  motor1forward(50);
-  delay(500);
-  motor1reverse(50);
-  delay(500);
- 
-  //servo_full_movement();
- 
-}
-
