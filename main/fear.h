@@ -20,6 +20,7 @@ public:
 private:
   	bool isServoSwapped;
   	bool isMotorSwapped;
+    bool isLedSwapped;
 };
 
 #endif // FEAR_H_

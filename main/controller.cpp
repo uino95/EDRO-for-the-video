@@ -11,10 +11,10 @@ Controller::Controller(MyServo * (&servoPtr)[3], Motor * (&motorPtr)[2], Led * &
   this->sonar = sonarPtr;
 
   this->consecutive = 0;
-  this->threshold = 40;
+  this->threshold = 10;
   this->distance = 0;
   this->obstacleFound = 4;
-  this->sonar_interval = 10;
+  this->sonar_interval = 25;
   this->sonar_last_millis = 0;
 
 	Neutral* n = new Neutral(this->servoPtrs, this->motorPtrs, this->led);
@@ -52,17 +52,21 @@ void Controller::updateEmotion(unsigned long current_millis){
 			setEmotion(n);
       isNeutral = 1;
 		}
-    //else {
-      //if(current_millis - this->sonar_last_millis >= this->sonar_interval){
-        //checkObstacle();
-        //Serial.println("hey ther");
-     // }
-    //}
+    else {
+      if(current_millis - this->sonar_last_millis >= this->sonar_interval){
+        //this->sonar_last_millis = millis();
+        //changeEmotion();
+        checkObstacle();
+        Serial.println("hey ther");
+      }
+    }
 	}
 }
 
 void Controller::changeEmotion(){
   current_emotion->stop();
+  this->consecutive = 0;
+  this->threshold = 10;
   isNeutral = 0;
   switch(counter){
     case 1:

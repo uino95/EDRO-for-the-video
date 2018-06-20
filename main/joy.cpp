@@ -12,7 +12,7 @@ Joy::Joy(MyServo * (&servoPtr)[3], Motor* (&motorPtr)[2], Led * &led, unsigned l
     this->led_last_millis = 0;
   	this->servo_interval = 400;
   	this->motor_interval = 150;
-    this->led_interval = 0;
+    this->led_interval = 200;
 
 	this->servo1 = servoPtr[0];
 	this->servo2 = servoPtr[1];
@@ -23,6 +23,7 @@ Joy::Joy(MyServo * (&servoPtr)[3], Motor* (&motorPtr)[2], Led * &led, unsigned l
 
   	this->isMotorSwapped = 0;
   	this->isServoSwapped = 0;
+   this->isLedSwapped = 0;
    
    
 }
@@ -69,9 +70,14 @@ void Joy::musicAction(){}
 
 void Joy::ledAction(){
   this->led_last_millis = millis();
-  this->led_interval = this->emotion_duration;
-  Serial.println("led");
+  if(isLedSwapped){
     led->light(150,150,0);
+    isLedSwapped = 0;
+  } else {
+    led->light(0,0,0);
+    isLedSwapped = 1;
+  }
+  
   }
 
 void Joy::stop(){

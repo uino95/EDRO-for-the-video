@@ -68,7 +68,7 @@ void Disgust::ledAction(){
       this->led_last_millis = millis();
   this->led_interval = this->emotion_duration;
   Serial.println("led");
-    led->light(102,150,0);  
+    led->light(0,150,0);  
 }
 
 void Disgust::stop(){

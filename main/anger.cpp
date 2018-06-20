@@ -5,14 +5,14 @@ Anger::Anger(MyServo * (&servoPtr)[3], Motor* (&motorPtr)[2], Led * &led, unsign
 
 	Serial.println("enter Anger state");
 
-	this->emotion_duration = 10000;
+	this->emotion_duration = 5000;
 	this->emotion_started = start;
   	this->servo_last_millis = 0;
   	this->motor_last_millis = 0;
     this->led_last_millis = 0;
   	this->servo_interval = 200;
   	this->motor_interval = 400;
-   this->led_interval = 0;
+   this->led_interval = 50;
 
 	this->servo1 = servoPtr[0];
 	this->servo2 = servoPtr[1];
@@ -23,6 +23,22 @@ Anger::Anger(MyServo * (&servoPtr)[3], Motor* (&motorPtr)[2], Led * &led, unsign
   	this->isMotorSwapped = 0;
   	this->isServoSwapped = 0; 
     this->isFirstTime = 1;
+
+    this->initColor[0] = 50;
+    this->initColor[1] = 0;
+    this->initColor[2] = 0;
+    this->endColor[0] = 150;
+    this->endColor[1] = 0;
+    this->endColor[2] = 0;
+    
+    for(int i = 0; i< 3; i++){
+      this->steps[i] = round((float)abs((int)this->initColor[i] - (int)this->endColor[i]) * (int)this->led_interval / (this->servo_interval * 2));
+      if(this->steps[i] < 1){
+        this->steps[i] = 1;
+      }
+      Serial.println(this->steps[i]);
+      this->currentColor[i] = initColor[i];
+    }
 }
 
 Anger::~Anger(){
@@ -69,11 +85,18 @@ void Anger::servoAction(){
 void Anger::musicAction(){}
 
 void Anger::ledAction(){
-    this->led_last_millis = millis();
-    this->led_interval = this->emotion_duration;
-    Serial.println("led");
-    led->light(150,20,0);
-  }
+    if(this->currentColor[0] >= this->endColor[0] && this->currentColor[1] >= this->endColor[1] && this->currentColor[2] >= this->endColor[2]){
+      for(int i = 0; i < 3; i++){
+        currentColor[i] = initColor[i];
+      }
+    } else {
+      led->light(this->currentColor[0], this->currentColor[1], this->currentColor[2]);
+      for(int i = 0; i < 3; i++){
+        currentColor[i] = currentColor[i] + this->steps[i];
+      }
+    }
+    this->led_last_millis = millis(); 
+}
 
 void Anger::stop(){
 	motor1->stop();

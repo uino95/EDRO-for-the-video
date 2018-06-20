@@ -12,7 +12,7 @@ Fear::Fear(MyServo * (&servoPtr)[3], Motor* (&motorPtr)[2], Led * &led, unsigned
      this->led_last_millis = 0;
   	this->servo_interval = 0;
   	this->motor_interval = 50;
-     this->led_interval = 0;
+     this->led_interval = 50;
     
 
 	this->servo1 = servoPtr[0];
@@ -22,7 +22,8 @@ Fear::Fear(MyServo * (&servoPtr)[3], Motor* (&motorPtr)[2], Led * &led, unsigned
 	this->motor2 = motorPtr[1];
 
   	this->isMotorSwapped = 0;
-  	this->isServoSwapped = 0;  
+  	this->isServoSwapped = 0; 
+    this->isLedSwapped = 1; 
    
 }
 
@@ -59,10 +60,15 @@ void Fear::servoAction(){
 void Fear::musicAction(){}
 
 void Fear::ledAction(){
-    this->led_last_millis = millis();
-  this->led_interval = this->emotion_duration;
-  Serial.println("led");
-    led->light(150,0,150);  
+   this->led_last_millis = millis();
+  if(isLedSwapped){
+    led->light(150,0,150);
+    isLedSwapped = 0;
+  } else {
+    led->light(0,0,0);
+    isLedSwapped = 1;
+  }
+  
 }
 
 void Fear::stop(){

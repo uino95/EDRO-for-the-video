@@ -17,6 +17,7 @@ using namespace std;
 class Controller {
 
 public:
+	//make it private
 	Emotion* current_emotion;
 	Controller(MyServo * (&servoPtr)[3], Motor * (&motorPtr)[2], Led * &led, Sonar * &sonar);
 	void init();

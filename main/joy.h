@@ -20,6 +20,7 @@ public:
 private:
   	bool isServoSwapped;
   	bool isMotorSwapped;
+    bool isLedSwapped;
 };
 
 #endif // JOY_H_

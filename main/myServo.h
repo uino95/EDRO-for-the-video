@@ -10,10 +10,10 @@ class MyServo{
 public:
 	MyServo();
 	void reset();
-	VarSpeedServo servo;
+	VarSpeedServo servo; //TODO make this this private
 	void move(int pos, int speed);
  	void Attach(int pin);
-  	void Detach();
+  	void Detach(); //TODO delete this method
 
 private:
 	bool isInverse; 
