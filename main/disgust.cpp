@@ -1,27 +1,30 @@
 #include "disgust.h"
-#include <Arduino.h>
 
-Disgust::Disgust(MyServo * (&servoPtr)[3], Motor* (&motorPtr)[2], Led * &led, unsigned long start){
+Disgust::Disgust(Controller* controller, unsigned long start){
 
 	Serial.println("enter Disgust state");
-
-	this->emotion_duration = 3000;
+  
+  this->controller = controller;
+  
+	this->emotion_duration = 2500;
 	this->emotion_started = start;
-  	this->servo_last_millis = 0;
-  	this->motor_last_millis = 400;
-     this->led_last_millis = 0;
-  	this->servo_interval = 1500;
-  	this->motor_interval = 0;
-    this->led_interval = 0;
 
-	this->servo1 = servoPtr[0];
-	this->servo2 = servoPtr[1];
-	this->servo3 = servoPtr[2];
-	this->motor1 = motorPtr[0];
-	this->motor2 = motorPtr[1];
+  this->motor_last_millis = 400;
+  this->led_last_millis = 0;
+  this->servo_last_millis = 0;
+  this->music_last_millis = 0;
+  this->sonar_last_millis = 0;
+  
+  this->servo_interval = 500;
+  this->motor_interval = 70;
+  this->led_interval = 0;
+  this->sonar_interval = 0;
+  this->music_interval = 0;
 
-  	this->isMotorSwapped = 0;
-  	this->isServoSwapped = 0; 
+  this->isServoSwapped = 0;
+  this->isMotorSwapped = 0;
+
+  controller->next_emotion = 6; //default the next emotion is setted to search
 }
 
 Disgust::~Disgust(){
@@ -31,49 +34,58 @@ Disgust::~Disgust(){
 void Disgust::motorAction(){
   Serial.println("motor action ");
   Serial.println(millis());
-  if(millis() - this->emotion_started < 1500){
+  if(millis() - this->emotion_started <= 500){
   if(isMotorSwapped){
     this->motor_last_millis = millis();
-    motor1->forward(255);
-    motor2->reverse(255);
+    controller->motor[0]->forward(255);
+    controller->motor[1]->reverse(255);
     isMotorSwapped = 0;
   } else {
     this->motor_last_millis = millis();
-    motor1->reverse(255);
-    motor2->forward(255);
+    controller->motor[0]->reverse(255);
+    controller->motor[1]->forward(255);
     isMotorSwapped = 1; 
   }
   } else {
-   motor1->reverse(100);
-   motor2->reverse(100);
+   controller->motor[0]->reverse(255);
+   controller->motor[1]->reverse(255);
   }
 }
 
 void Disgust::servoAction(){
   Serial.println("servo action ");
   Serial.println(millis());
-  if(millis() - this->emotion_started > 1500){
-	  servo1->move(15,50);
+  if(millis() - this->emotion_started >= 500){
+	  controller->servo[0]->open(50);
+    this->servo_last_millis = this->emotion_duration;
   } else {
     this->servo_last_millis = millis();
-    servo1->move(120,30);
-    servo2->move(120,30);
-    servo3->move(120,30);
+    controller->servo[0]->close(30);
+    controller->servo[1]->close(30);
+    controller->servo[2]->close(30);
   }
 }
 	
-void Disgust::musicAction(){}
+void Disgust::musicAction(){
+  this->music_last_millis = millis();
+  this->music_interval = this->emotion_duration;
+  controller->player->setVolume(30);
+  controller->player->play(5);
+}
 
 void Disgust::ledAction(){
       this->led_last_millis = millis();
   this->led_interval = this->emotion_duration;
   Serial.println("led");
-    led->light(0,150,0);  
+    controller->led->light(0,150,0);  
 }
 
+void Disgust::sonarAction(){}
+
 void Disgust::stop(){
-	motor1->stop();
-	motor2->stop();
- led->light(0,0,0);
+	controller->motor[0]->stop();
+	controller->motor[1]->stop();
+ controller->led->light(0,0,0);
+ controller->player->stop();
 	delete this;
 }

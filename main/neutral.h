@@ -3,21 +3,24 @@
 
 #include "controller.h"
 #include "emotion.h"
-#include "sonar.h"
 
 using namespace std;
 
 class Neutral: public Emotion{
 
 public:
-	Neutral(MyServo * (&servoPtr)[3], Motor * (&motorPtr)[2], Led * &ledPtr);
+	Neutral(Controller* controller);
 	~Neutral();
 
 	void motorAction();
 	void servoAction();
 	void musicAction();
 	void ledAction();
+ void sonarAction();
 	void stop();
+
+private: 
+	Controller* controller;
 };
 
 #endif // NEUTRAL_H_

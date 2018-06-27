@@ -2,22 +2,25 @@
 #define SADNESS_H_
 
 #include "emotion.h"
+#include "controller.h"
 
 using namespace std;
 
 class Sadness: public Emotion{
 
 public:
-	Sadness(MyServo * (&servoPtr)[3], Motor * (&motorPtr)[2], Led * &led, unsigned long start);
+	Sadness(Controller* controller, unsigned long start);
 	~Sadness();
 
 	void motorAction();
 	void servoAction();
 	void musicAction();
 	void ledAction();
+ void sonarAction();
 	void stop();
 
 private:
+	Controller* controller;
   	bool isServoSwapped;
   	bool isMotorSwapped;
     int steps[3];

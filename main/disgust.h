@@ -2,22 +2,25 @@
 #define DISGUST_H_
 
 #include "emotion.h"
+#include "controller.h"
 
 using namespace std;
 
 class Disgust: public Emotion{
 
 public:
-	Disgust(MyServo * (&servoPtr)[3], Motor * (&motorPtr)[2], Led * &led, unsigned long start);
+	Disgust(Controller* controller, unsigned long start);
 	~Disgust();
 
 	void motorAction();
 	void servoAction();
 	void musicAction();
 	void ledAction();
+ void sonarAction();
 	void stop();
 
 private:
+	Controller* controller;
   	bool isServoSwapped;
   	bool isMotorSwapped;
 };

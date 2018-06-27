@@ -1,27 +1,26 @@
 #include "sadness.h"
-#include <Arduino.h>
 
-Sadness::Sadness(MyServo * (&servoPtr)[3], Motor* (&motorPtr)[2], Led * &led ,unsigned long start){
+Sadness::Sadness(Controller* controller,unsigned long start){
 
 	Serial.println("enter Sadness state");
 
-	this->emotion_duration = 5000;
+  this->controller = controller;
+
+	this->emotion_duration = 7000;
 	this->emotion_started = start;
-  	this->servo_last_millis = 0;
-  	this->motor_last_millis = 0;
-     this->led_last_millis = 0;
-  	this->servo_interval = 0;
-  	this->motor_interval = 0;
-    this->led_interval = 100;
 
-	this->servo1 = servoPtr[0];
-	this->servo2 = servoPtr[1];
-	this->servo3 = servoPtr[2];
-	this->motor1 = motorPtr[0];
-	this->motor2 = motorPtr[1];
+  this->led_interval = 100;
+  this->servo_interval = 0;
+  this->motor_interval = 0;
+  this->sonar_interval = 0;
+  this->music_interval = 0;
 
-  	this->isMotorSwapped = 0;
-  	this->isServoSwapped = 0; 
+  this->motor_last_millis = 0;
+  this->servo_last_millis = 0;
+  this->music_last_millis = 0;
+  this->led_last_millis = 0;
+  this->sonar_last_millis = 0;
+
     this->initColor[0] = 0;
     this->initColor[1] = 150;
     this->initColor[2] = 150;
@@ -34,10 +33,11 @@ Sadness::Sadness(MyServo * (&servoPtr)[3], Motor* (&motorPtr)[2], Led * &led ,un
       if(this->steps[i] < 1){
         this->steps[i] = 1;
       }
-      Serial.println(this->steps[i]);
+      //Serial.println(this->steps[i]);
       this->currentColor[i] = initColor[i];
     }
     
+    controller->next_emotion = 6; //default the next emotion/state will be search
 }
 
 Sadness::~Sadness(){
@@ -47,56 +47,78 @@ Sadness::~Sadness(){
 void Sadness::motorAction(){
   Serial.println("motor action ");
   Serial.println(millis());
-  if(millis() - this->emotion_started < (this->emotion_duration / 2)){
-    Serial.println("motor action firat ");
-    motor1->forward(100);
-    motor2->stop();
+  if(millis() - this->emotion_started < (this->emotion_duration / 5)){
+    //Serial.println("motor action < 1/3 ");
+     //Serial.println(millis() -  this->emotion_started);
+    controller->motor[0]->stop();
+    controller->motor[1]->stop();
     this->motor_last_millis = millis();
-    this->motor_interval = (this->emotion_duration / 2);
-  } else {
-    Serial.println("motor action second ");
-    motor1->stop();
-    motor2->forward(100);
-    this->motor_interval = this->emotion_duration;
-    this->motor_last_millis = millis();
+    this->motor_interval = (this->emotion_duration* 2/5);
+  } 
+  if (millis() - this->emotion_started >= this->emotion_duration* 2/5){
+    this->motor_interval = 1000;
+    //Serial.println("motor action > 2/3 ");
+     //Serial.println(millis() -  this->emotion_started);
+    if(isMotorSwapped){
+      controller->motor[0]->forward(180);
+      controller->motor[1]->reverse(230);
+      this->motor_last_millis = millis();
+      isMotorSwapped = 0;
+    } else {
+      controller->motor[0]->reverse(230);
+      controller->motor[1]->forward(180);
+      this->motor_last_millis = millis();
+      isMotorSwapped = 1;
+    }
+    
   }
 }
 
 void Sadness::servoAction(){
-  Serial.println("servo action ");
-  Serial.println(millis());
-  if(millis() - this->emotion_started < this->emotion_duration / 2){
-    Serial.println("servo action first");
-    servo1->move(120,25);
-    servo2->move(120,25);
-    servo3->move(120,25);
+  //Serial.println("servo action ");
+  //Serial.println(millis());
+  if(millis() - this->emotion_started < this->emotion_duration / 5){
+    //Serial.println("servo action first");
+    //Serial.println(millis() -  this->emotion_started);
+    controller->servo[0]->close(25);
+    controller->servo[1]->close(25);
+    controller->servo[2]->close(25);
     this->servo_last_millis = millis();
-    this->servo_interval = this->emotion_duration / 2;
+    this->servo_interval = this->emotion_duration /5;
   } else {
-    Serial.println("servo action second");
-    servo1->move(15,25);
-    servo2->move(15,25);
-    servo3->move(15,25);
+    //Serial.println("servo action second");
+    Serial.println(millis() -  this->emotion_started);
+    controller->servo[0]->open(25);
+    controller->servo[1]->open(25);
+    controller->servo[2]->open(25);
     this->servo_interval = this->emotion_duration;
     this->servo_last_millis = millis();
   }
 }
 
   
-void Sadness::musicAction(){}
+void Sadness::musicAction(){
+  this->music_last_millis = millis();
+  this->music_interval = this->emotion_duration;
+  controller->player->setVolume(30);
+  controller->player->play(8);
+}
 
 void Sadness::ledAction(){
   this->led_last_millis = millis();
   //Serial.println("led");
-  led->light(this->currentColor[0], this->currentColor[1], this->currentColor[2]);
+  controller->led->light(this->currentColor[0], this->currentColor[1], this->currentColor[2]);
   for(int i = 0; i < 3; i++){
     currentColor[i] = currentColor[i] - this->steps[i];
   }
 }
 
+void Sadness::sonarAction(){}
+
 void Sadness::stop(){
-	motor1->stop();
-	motor2->stop();
-  led->light(0,0,0);
+	controller->motor[0]->stop();
+	controller->motor[1]->stop();
+  controller->led->light(0,0,0);
+  controller->player->stop();
 	delete this;
 }

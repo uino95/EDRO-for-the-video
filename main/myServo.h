@@ -12,12 +12,14 @@ public:
 	void reset();
 	VarSpeedServo servo; //TODO make this this private
 	void move(int pos, int speed);
- 	void Attach(int pin);
-  	void Detach(); //TODO delete this method
+	void close(int speed);
+	void open(int speed);
+ 	void setup(int pin);
+  void Detach(); //TODO delete this method
 
 private:
-	bool isInverse; 
-	int inverse(int pos);
+  int pin;
+  int computePos(int pos);
 };
 
 #endif // MYSERVO_H_

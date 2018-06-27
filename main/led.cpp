@@ -4,7 +4,7 @@
 
 Led::Led(){}
 
-void Led::configure(int pinRed, int pinGreen, int pinBlue){
+void Led::setup(int pinRed, int pinGreen, int pinBlue){
   pinMode(pinRed, OUTPUT);
   pinMode(pinGreen, OUTPUT);
   pinMode(pinBlue, OUTPUT);

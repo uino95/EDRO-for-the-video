@@ -1,30 +1,31 @@
 #include "joy.h"
-#include <Arduino.h>
 
-Joy::Joy(MyServo * (&servoPtr)[3], Motor* (&motorPtr)[2], Led * &led, unsigned long start){
+Joy::Joy(Controller* controller, unsigned long start){
 
 	Serial.println("enter Joy state");
 
-	  this->emotion_duration = 10000;
-	  this->emotion_started = start;
-  	this->servo_last_millis = 0;
-  	this->motor_last_millis = 0;
-    this->led_last_millis = 0;
-  	this->servo_interval = 400;
-  	this->motor_interval = 150;
-    this->led_interval = 200;
+  this->controller = controller;
 
-	this->servo1 = servoPtr[0];
-	this->servo2 = servoPtr[1];
-	this->servo3 = servoPtr[2];
-	this->motor1 = motorPtr[0];
-	this->motor2 = motorPtr[1];
-  this->led = led;
+	this->emotion_duration = 10000;
+	this->emotion_started = start;
 
-  	this->isMotorSwapped = 0;
-  	this->isServoSwapped = 0;
-   this->isLedSwapped = 0;
-   
+  this->servo_interval = 350;
+  this->motor_interval = 150;
+  this->led_interval = 200;
+  this->sonar_interval = 500;
+  this->music_interval = 0;
+
+  this->motor_last_millis = 0;
+  this->servo_last_millis = 0;
+  this->music_last_millis = 0;
+  this->led_last_millis = 0;
+  this->sonar_last_millis = 0;
+
+  this->isMotorSwapped = 0;
+  this->isServoSwapped = 0;
+  this->isLedSwapped = 0;
+
+  controller->next_emotion = 7;
    
 }
 
@@ -33,56 +34,64 @@ Joy::~Joy(){
 }
 
 void Joy::motorAction(){
-  Serial.println("motor action ");
-  Serial.println(millis());
+  //Serial.println("motor action ");
+  //Serial.println(millis());
 	if(isMotorSwapped){
 		this->motor_last_millis = millis();
-		motor1->forward(255);
-		motor2->reverse(255);
+		controller->motor[0]->forward(255);
+		controller->motor[1]->reverse(255);
 		isMotorSwapped = 0;
 	} else {
 		this->motor_last_millis = millis();
-		motor1->reverse(255);
-		motor2->forward(255);
+		controller->motor[0]->reverse(255);
+		controller->motor[1]->forward(255);
 		isMotorSwapped = 1;	
 	}
 }
 
 void Joy::servoAction(){
-  Serial.println("servo action ");
-  Serial.println(millis());
+  //Serial.println("servo action ");
+  //Serial.println(millis());
   if(isServoSwapped){
     this->servo_last_millis = millis();
-	  servo1->move(45,30);
-	  servo2->move(45,30);
-	  servo3->move(45,30);
+	  controller->servo[0]->move(20,40);
+	  controller->servo[1]->move(20,40);
+	  controller->servo[2]->move(20,40);
     isServoSwapped = 0;
   } else {
     this->servo_last_millis = millis();
-    servo1->move(80,30);
-    servo2->move(80,30);
-    servo3->move(80,30);
+    controller->servo[0]->move(60,40);
+    controller->servo[1]->move(60,40);
+    controller->servo[2]->move(60,40);
     isServoSwapped = 1;
   }
 }
 	
-void Joy::musicAction(){}
+void Joy::musicAction(){
+  this->music_last_millis = millis();
+  this->music_interval = this->emotion_duration;
+  controller->player->setVolume(30);
+  controller->player->play(7);
+}
 
 void Joy::ledAction(){
   this->led_last_millis = millis();
   if(isLedSwapped){
-    led->light(150,150,0);
+    controller->led->light(150,150,0);
     isLedSwapped = 0;
   } else {
-    led->light(0,0,0);
+    controller->led->light(0,0,0);
     isLedSwapped = 1;
   }
   
-  }
+}
+
+void Joy::sonarAction(){}
 
 void Joy::stop(){
-	motor1->stop();
-	motor2->stop();
-  led->light(0,0,0);
+	controller->motor[0]->stop();
+	controller->motor[1]->stop();
+  controller->led->light(0,0,0);
+  controller->player->stop();
 	delete this;
 }

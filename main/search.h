@@ -1,22 +1,22 @@
-#ifndef JOY_H_
-#define JOY_H_
+#ifndef SEARCH_H_
+#define SEARCH_H_
 
 #include "emotion.h"
 #include "controller.h"
 
 using namespace std;
 
-class Joy: public Emotion{
+class Search: public Emotion{
 
 public:
-	Joy(Controller* controller, unsigned long start);
-	~Joy();
+	Search(Controller* controller, unsigned long start);
+	~Search();
 
 	void motorAction();
 	void servoAction();
 	void musicAction();
 	void ledAction();
- void sonarAction();
+	void sonarAction();
 	void stop();
 
 private:
@@ -24,6 +24,12 @@ private:
   	bool isServoSwapped;
   	bool isMotorSwapped;
     bool isLedSwapped;
+
+	int distance;
+	int consecutive;
+	int threshold;
+	int obstacleFound;
+	unsigned long rotation;
 };
 
-#endif // JOY_H_
+#endif // SEARCH_H_

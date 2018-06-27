@@ -1,35 +1,35 @@
 #include "anger.h"
-#include <Arduino.h>
 
-Anger::Anger(MyServo * (&servoPtr)[3], Motor* (&motorPtr)[2], Led * &led, unsigned long start){
+Anger::Anger(Controller* controller, unsigned long start){
 
 	Serial.println("enter Anger state");
 
-	this->emotion_duration = 5000;
+  this->controller = controller;
+
+	this->emotion_duration = 10000;
 	this->emotion_started = start;
-  	this->servo_last_millis = 0;
-  	this->motor_last_millis = 0;
-    this->led_last_millis = 0;
-  	this->servo_interval = 200;
-  	this->motor_interval = 400;
-   this->led_interval = 50;
+  
+  this->servo_interval = 200;
+  this->motor_interval = 50;
+  this->led_interval = 50;
+  this->sonar_interval = 500;
+  this->music_interval = 0;
 
-	this->servo1 = servoPtr[0];
-	this->servo2 = servoPtr[1];
-	this->servo3 = servoPtr[2];
-	this->motor1 = motorPtr[0];
-	this->motor2 = motorPtr[1];
+  this->motor_last_millis = 0;
+  this->servo_last_millis = 0;
+  this->music_last_millis = 0;
+  this->led_last_millis = 0;
+  this->sonar_last_millis = 0;
 
-  	this->isMotorSwapped = 0;
-  	this->isServoSwapped = 0; 
-    this->isFirstTime = 1;
-
-    this->initColor[0] = 50;
-    this->initColor[1] = 0;
-    this->initColor[2] = 0;
-    this->endColor[0] = 150;
-    this->endColor[1] = 0;
-    this->endColor[2] = 0;
+  this->isMotorSwapped = 1;
+  this->isServoSwapped =1;
+  
+  this->initColor[0] = 50;
+  this->initColor[1] = 0;
+  this->initColor[2] = 0;
+  this->endColor[0] = 150;
+  this->endColor[1] = 0;
+  this->endColor[2] = 0;
     
     for(int i = 0; i< 3; i++){
       this->steps[i] = round((float)abs((int)this->initColor[i] - (int)this->endColor[i]) * (int)this->led_interval / (this->servo_interval * 2));
@@ -39,6 +39,10 @@ Anger::Anger(MyServo * (&servoPtr)[3], Motor* (&motorPtr)[2], Led * &led, unsign
       Serial.println(this->steps[i]);
       this->currentColor[i] = initColor[i];
     }
+
+  this->threshold = 40;
+  this->obstacleFound = 2;
+  controller->next_emotion = 6; //default the next emotion is setted to search.
 }
 
 Anger::~Anger(){
@@ -48,41 +52,55 @@ Anger::~Anger(){
 void Anger::motorAction(){
   //Serial.println("motor action ");
   //Serial.println(millis());
-	if(isMotorSwapped){
-		this->motor_last_millis = millis();
-		motor1->forward(255);
-		motor2->forward(255);
-		isMotorSwapped = 0;
-	} else {
-		this->motor_last_millis = millis();
-		motor1->stop();
-		motor2->stop();
-		isMotorSwapped = 1;	
-	}
+  if(millis() -  this->emotion_started <= 2000){
+    this->motor_last_millis = millis();
+    controller->motor[0]->forward(255);
+    controller->motor[1]->reverse(255);
+  } else {
+    this->motor_interval = 400;
+  	if(isMotorSwapped){
+  		this->motor_last_millis = millis();
+  		controller->motor[0]->forward(255);
+  		controller->motor[1]->forward(255);
+  		isMotorSwapped = 0;
+  	} else {
+  		this->motor_last_millis = millis();
+  		controller->motor[0]->stop();
+  		controller->motor[1]->stop();
+  		isMotorSwapped = 1;	
+  	}
+  }
 }
 
 void Anger::servoAction(){
   //Serial.println("servo action ");
   //Serial.println(millis());
-  if(isFirstTime){
+  if(millis() -  this->emotion_started <= 2000){
     this->servo_last_millis = millis();
-    servo1->move(15,30);
-    isFirstTime = 0;
-  }
-  if(isServoSwapped){
-    this->servo_last_millis = millis();
-	  servo2->move(90,30);
-	  servo3->move(90,30);
-    isServoSwapped = 0;
+    controller->servo[0]->move(30,30);
+    controller->servo[1]->move(30,30);
+    controller->servo[2]->move(30,30);
   } else {
-    servo2->move(120,150);
-    servo3->move(120,150);
-    isServoSwapped = 1;
-    this->servo_last_millis = millis();
+    if(isServoSwapped){
+      this->servo_last_millis = millis();
+  	  controller->servo[1]->move(50,90);
+  	  controller->servo[2]->move(50,90);
+      isServoSwapped = 0;
+    } else {
+      this->servo_last_millis = millis();
+      controller->servo[1]->close(250);
+      controller->servo[2]->close(250);
+      isServoSwapped = 1;
+    }
   }
 }
 	
-void Anger::musicAction(){}
+void Anger::musicAction(){
+  this->music_last_millis = millis();
+  this->music_interval = this->emotion_duration;
+  controller->player->setVolume(30);
+  controller->player->play(1);
+}
 
 void Anger::ledAction(){
     if(this->currentColor[0] >= this->endColor[0] && this->currentColor[1] >= this->endColor[1] && this->currentColor[2] >= this->endColor[2]){
@@ -90,7 +108,7 @@ void Anger::ledAction(){
         currentColor[i] = initColor[i];
       }
     } else {
-      led->light(this->currentColor[0], this->currentColor[1], this->currentColor[2]);
+      controller->led->light(this->currentColor[0], this->currentColor[1], this->currentColor[2]);
       for(int i = 0; i < 3; i++){
         currentColor[i] = currentColor[i] + this->steps[i];
       }
@@ -98,9 +116,26 @@ void Anger::ledAction(){
     this->led_last_millis = millis(); 
 }
 
+void Anger::sonarAction(){
+  this->sonar_interval = 25;
+  this->sonar_last_millis = millis();
+  this->distance = controller->sonar->computeDistance();
+  if(this->distance < this->threshold && this->distance > 0){
+    this->consecutive ++;
+    if (this->consecutive = this->obstacleFound){
+      //change to fear
+      controller->next_emotion = 4;
+      this->emotion_started = this->emotion_duration;
+    }
+  } else {
+    this->consecutive = 0;
+  }
+}
+
 void Anger::stop(){
-	motor1->stop();
-	motor2->stop();
-  led->light(0,0,0);
+	controller->motor[0]->stop();
+	controller->motor[1]->stop();
+  controller->led->light(0,0,0);
+  controller->player->stop();
 	delete this;
 }
