@@ -23,7 +23,7 @@ Fear::Fear(Controller* controller, unsigned long start){
   this->isLedSwapped = 1; 
   this->isMotorSwapped = 0;
   this->isServoSwapped = 0;
-  controller->next_emotion = 6;//default the next emotion is set to search 
+  //controller->next_emotion = 6;//default the next emotion is set to search 
 }
 
 Fear::~Fear(){

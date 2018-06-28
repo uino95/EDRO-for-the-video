@@ -37,7 +37,7 @@ Sadness::Sadness(Controller* controller,unsigned long start){
       this->currentColor[i] = initColor[i];
     }
     
-    controller->next_emotion = 6; //default the next emotion/state will be search
+   // controller->next_emotion = 6; //default the next emotion/state will be search
 }
 
 Sadness::~Sadness(){

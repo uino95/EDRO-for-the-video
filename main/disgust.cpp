@@ -24,7 +24,7 @@ Disgust::Disgust(Controller* controller, unsigned long start){
   this->isServoSwapped = 0;
   this->isMotorSwapped = 0;
 
-  controller->next_emotion = 6; //default the next emotion is setted to search
+  //controller->next_emotion = 6; //default the next emotion is setted to search
 }
 
 Disgust::~Disgust(){

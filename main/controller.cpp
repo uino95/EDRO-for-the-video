@@ -18,15 +18,16 @@ Controller::Controller(MyServo * (&servoPtr)[3], Motor * (&motorPtr)[2], Led * &
   this->player = playerPtr;
   this->sonar = sonarPtr;
 
-  // this->consecutive = 0;
-  // this->threshold = 10;
-  // this->distance = 0;
-  // this->obstacleFound = 4;
-  // this->sonar_interval = 25;
-  // this->sonar_last_millis = 0;
+   this->consecutive = 0;
+   this->threshold = 10;
+   this->distance = 0;
+   this->obstacleFound = 4;
+   this->sonar_interval = 25;
+   this->sonar_last_millis = 0;
+   isNeutral = 1;
 
-  Search* s = new Search(this, millis());
-  current_emotion = s;
+  Neutral* n = new Neutral(this, millis(), 1);
+  current_emotion = n;
 }
 
 void Controller::setEmotion(Emotion * e){
@@ -54,92 +55,100 @@ void Controller::updateEmotion(unsigned long current_millis){
     }
 	} else {
     changeEmotion();
-
-
-		// //TODO stop() could be also the destroyer of the single emotion, which has to stop all the motors
-		// if (!isNeutral){//aka we aren't in neutral state;
-		// 	current_emotion->stop();
-		// 	Neutral* n = new Neutral(this);
-		// 	setEmotion(n);
-  //     isNeutral = 1;
-		// }
-  //   else {
-  //     if(current_millis - this->sonar_last_millis >= this->sonar_interval){
-  //       //this->sonar_last_millis = millis();
-  //       //changeEmotion();
-  //       checkObstacle();
-  //       Serial.println("hey ther");
-  //     }
-  //   }
 	}
 }
 
 void Controller::changeEmotion(){
   current_emotion->stop();
+  isNeutral = 1;
+  this->threshold = 10;
+  this->consecutive = 0;
   switch(next_emotion){
     case 1:
     {
       Joy* j = new Joy(this, millis());
       setEmotion(j);
+      next_emotion ++;
       break;
     }
     case 2:
     {
-      Anger* a = new Anger(this, millis());
-      setEmotion(a);
-      break; 
+      Neutral* n = new Neutral(this, millis(), 1);
+      setEmotion(n);
+      next_emotion ++;
+      break;
     }
     case 3:
     {
-      Disgust* d = new Disgust(this, millis());
-      setEmotion(d);
-      break;
+      Anger* a = new Anger(this, millis());
+      setEmotion(a);
+      next_emotion ++;
+      break; 
     }
     case 4:
     {
-      Fear* f = new Fear(this, millis());
-      setEmotion(f);
+      Neutral* n = new Neutral(this, millis(), 1);
+      setEmotion(n);
+      next_emotion ++;
       break;
     }
     case 5:
     {
-      Sadness* s = new Sadness(this, millis());
-      setEmotion(s);
+      Disgust* d = new Disgust(this, millis());
+      setEmotion(d);
+      next_emotion ++;
       break;
     }
     case 6:
     {
-      Search* s = new Search(this, millis());
-      setEmotion(s);
+      Neutral* n = new Neutral(this, millis(), 0);
+      setEmotion(n);
+      next_emotion ++;
       break;
     }
     case 7:
     {
-      Explore* e = new Explore(this, millis());
-      setEmotion(e);
+      Fear* f = new Fear(this, millis());
+      setEmotion(f);
+      next_emotion ++;
+      break;
+    }
+    case 8:
+    {
+      Neutral* n = new Neutral(this, millis(), 0);
+      setEmotion(n);
+      next_emotion ++;
+      break;
+    }
+    case 9:
+    {
+      Sadness* s = new Sadness(this, millis());
+      setEmotion(s);
+      next_emotion ++;
       break;
     }
     default:
     {
-      Neutral* n = new Neutral(this);
+      Neutral* n = new Neutral(this, millis(), 1);
       setEmotion(n);
-      next_emotion= 0;
+      next_emotion= 1;
+      break;
     }
   }
   Serial.println("emotion changed");
 }
 
 
-// void Controller::checkObstacle(){
-//   this->sonar_last_millis = millis();
-//   this->distance = sonar->computeDistance();
-//   if(this->distance < this->threshold && this->distance > 0){
-//     this->consecutive ++;
-//     if (this->consecutive = this->obstacleFound){
-//       this->threshold = 4000;
-//       changeEmotion();
-//     }
-//   } else {
-//     this->consecutive = 0;
-//   }
-// }
+void Controller::checkObstacle(){
+   this->sonar_last_millis = millis();
+   this->distance = sonar->computeDistance();
+   if(this->distance < this->threshold && this->distance > 0){
+     this->consecutive ++;
+     if (this->consecutive = this->obstacleFound){
+       this->threshold = 4000;
+       changeEmotion();
+     }
+   } else {
+     this->consecutive = 0;
+   }
+ }

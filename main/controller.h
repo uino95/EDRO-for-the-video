@@ -28,6 +28,13 @@ public:
 	int next_emotion;
 
 private:
+  int consecutive;
+  int threshold;
+  int distance;
+  int obstacleFound;
+  unsigned long sonar_interval;
+  unsigned long sonar_last_millis;
+  bool isNeutral;
 
 	Emotion* current_emotion;
 };

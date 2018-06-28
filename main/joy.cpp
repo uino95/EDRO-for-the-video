@@ -25,7 +25,7 @@ Joy::Joy(Controller* controller, unsigned long start){
   this->isServoSwapped = 0;
   this->isLedSwapped = 0;
 
-  controller->next_emotion = 7;
+  //controller->next_emotion = 7;
    
 }
 

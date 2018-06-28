@@ -9,7 +9,7 @@ using namespace std;
 class Neutral: public Emotion{
 
 public:
-	Neutral(Controller* controller);
+	Neutral(Controller* controller, unsigned long current_millis, bool closed);
 	~Neutral();
 
 	void motorAction();
@@ -21,6 +21,7 @@ public:
 
 private: 
 	Controller* controller;
+  bool closed;
 };
 
 #endif // NEUTRAL_H_

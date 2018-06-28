@@ -42,7 +42,7 @@ Anger::Anger(Controller* controller, unsigned long start){
 
   this->threshold = 40;
   this->obstacleFound = 1;
-  controller->next_emotion = 6; //default the next emotion is setted to search.
+  //controller->next_emotion = 6; //default the next emotion is setted to search.
 }
 
 Anger::~Anger(){
@@ -117,19 +117,7 @@ void Anger::ledAction(){
 }
 
 void Anger::sonarAction(){
-  this->sonar_interval = 25;
-  this->sonar_last_millis = millis();
-  this->distance = controller->sonar->computeDistance();
-  if(this->distance < this->threshold && this->distance > 0){
-    this->consecutive ++;
-    if (this->consecutive = this->obstacleFound){
-      //change to fear
-      controller->next_emotion = 4;
-      this->emotion_started = this->emotion_duration;
-    }
-  } else {
-    this->consecutive = 0;
-  }
+
 }
 
 void Anger::stop(){
