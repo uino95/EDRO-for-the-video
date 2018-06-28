@@ -14,8 +14,8 @@ Fear::Fear(Controller* controller, unsigned long start){
   this->sonar_interval = 0;
   this->music_interval = 0;
 
-  this->motor_last_millis = 0;
-  this->servo_last_millis = 0;
+  this->motor_last_millis = start;
+  this->servo_last_millis = start;
   this->music_last_millis = 0;
   this->led_last_millis = 0;
   this->sonar_last_millis = 0;
@@ -33,6 +33,7 @@ Fear::~Fear(){
 void Fear::motorAction(){
   Serial.println("motor action ");
   Serial.println(millis());
+  //this->motor_interval = 50;
 	if(isMotorSwapped){
 		this->motor_last_millis = millis();
 		controller->motor[0]->forward(255);
@@ -60,10 +61,11 @@ void Fear::musicAction(){
   this->music_last_millis = millis();
   this->music_interval = this->emotion_duration;
   controller->player->setVolume(30);
-  controller->player->play(6);
+  controller->player->play(9);
 }
 
 void Fear::ledAction(){
+  //this->led_interval = 50;
    this->led_last_millis = millis();
   if(isLedSwapped){
     controller->led->light(150,0,150);
@@ -80,7 +82,7 @@ void Fear::sonarAction(){};
 void Fear::stop(){
 	controller->motor[0]->stop();
 	controller->motor[1]->stop();
- controller->led->light(0,0,0);
- controller->player->stop();
+  controller->led->light(0,0,0);
+  controller->player->stop();
 	delete this;
 }

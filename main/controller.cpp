@@ -76,9 +76,6 @@ void Controller::updateEmotion(unsigned long current_millis){
 
 void Controller::changeEmotion(){
   current_emotion->stop();
-  // this->consecutive = 0;
-  // this->threshold = 10;
-  //isNeutral = 0;
   switch(next_emotion){
     case 1:
     {

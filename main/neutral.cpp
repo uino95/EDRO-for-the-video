@@ -6,13 +6,12 @@ Neutral::Neutral(Controller* controller){
 
 	this->controller = controller;
 
-	this->emotion_duration = 0;
+	this->emotion_duration = 0;//duration of the emotion in milliseconds
 	this->emotion_started = 0;
 
 	motorAction();
 	servoAction();
 	ledAction();
-	
 }
 
 Neutral::~Neutral(){
@@ -29,9 +28,9 @@ void Neutral::motorAction(){
 void Neutral::servoAction(){
   Serial.println("servo action neutral");
   Serial.println(millis());
-	controller->servo[0]->move(55,30);
-    controller->servo[1]->move(55, 30);
-    controller->servo[2]->move(55, 30);	
+	controller->servo[0]->close(30);
+  controller->servo[1]->close(30);
+  controller->servo[2]->close(30);	
 }
 	
 void Neutral::musicAction(){}

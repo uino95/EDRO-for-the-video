@@ -15,10 +15,10 @@ Sadness::Sadness(Controller* controller,unsigned long start){
   this->sonar_interval = 0;
   this->music_interval = 0;
 
-  this->motor_last_millis = 0;
-  this->servo_last_millis = 0;
+  this->motor_last_millis = start;
+  this->servo_last_millis = start;
   this->music_last_millis = 0;
-  this->led_last_millis = 0;
+  this->led_last_millis = start;
   this->sonar_last_millis = 0;
 
     this->initColor[0] = 0;
@@ -60,13 +60,13 @@ void Sadness::motorAction(){
     //Serial.println("motor action > 2/3 ");
      //Serial.println(millis() -  this->emotion_started);
     if(isMotorSwapped){
-      controller->motor[0]->forward(180);
-      controller->motor[1]->reverse(230);
+      controller->motor[0]->reverse(180);
+      controller->motor[1]->forward(255);
       this->motor_last_millis = millis();
       isMotorSwapped = 0;
     } else {
-      controller->motor[0]->reverse(230);
-      controller->motor[1]->forward(180);
+      controller->motor[0]->forward(255);
+      controller->motor[1]->reverse(180);
       this->motor_last_millis = millis();
       isMotorSwapped = 1;
     }
@@ -101,7 +101,7 @@ void Sadness::musicAction(){
   this->music_last_millis = millis();
   this->music_interval = this->emotion_duration;
   controller->player->setVolume(30);
-  controller->player->play(8);
+  controller->player->play(5);
 }
 
 void Sadness::ledAction(){

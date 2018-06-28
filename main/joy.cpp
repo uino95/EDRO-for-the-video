@@ -15,10 +15,10 @@ Joy::Joy(Controller* controller, unsigned long start){
   this->sonar_interval = 0;
   this->music_interval = 0;
 
-  this->motor_last_millis = 0;
-  this->servo_last_millis = 0;
+  this->motor_last_millis = start;
+  this->servo_last_millis = start;
   this->music_last_millis = 0;
-  this->led_last_millis = 0;
+  this->led_last_millis = start;
   this->sonar_last_millis = 0;
 
   this->isMotorSwapped = 0;
@@ -71,7 +71,7 @@ void Joy::musicAction(){
   this->music_last_millis = millis();
   this->music_interval = this->emotion_duration;
   controller->player->setVolume(30);
-  controller->player->play(7);
+  controller->player->play(1);
 }
 
 void Joy::ledAction(){
