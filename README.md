@@ -1,2 +1,2 @@
-# EDRO
-Emotions Designed RObot, a robot which will express emotion for you
+# EDRO for the video
+Just the code for the video
