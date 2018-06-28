@@ -12,7 +12,7 @@ Anger::Anger(Controller* controller, unsigned long start){
   this->servo_interval = 200;
   this->motor_interval = 50;
   this->led_interval = 50;
-  this->sonar_interval = 500;
+  this->sonar_interval = 1500;
   this->music_interval = 0;
 
   this->motor_last_millis = 0;
@@ -41,7 +41,7 @@ Anger::Anger(Controller* controller, unsigned long start){
     }
 
   this->threshold = 40;
-  this->obstacleFound = 2;
+  this->obstacleFound = 1;
   controller->next_emotion = 6; //default the next emotion is setted to search.
 }
 
@@ -52,7 +52,7 @@ Anger::~Anger(){
 void Anger::motorAction(){
   //Serial.println("motor action ");
   //Serial.println(millis());
-  if(millis() -  this->emotion_started <= 2000){
+  if(millis() -  this->emotion_started <= 1500){
     this->motor_last_millis = millis();
     controller->motor[0]->forward(255);
     controller->motor[1]->reverse(255);
@@ -75,7 +75,7 @@ void Anger::motorAction(){
 void Anger::servoAction(){
   //Serial.println("servo action ");
   //Serial.println(millis());
-  if(millis() -  this->emotion_started <= 2000){
+  if(millis() -  this->emotion_started <= 1500){
     this->servo_last_millis = millis();
     controller->servo[0]->move(30,30);
     controller->servo[1]->move(30,30);

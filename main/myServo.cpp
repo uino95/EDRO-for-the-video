@@ -40,6 +40,7 @@ void MyServo::setup(int pin)
   {
     servo.attach(pin);
     this->pin = pin;
+    this->move(85,255);
   }
   
 void MyServo::Detach()

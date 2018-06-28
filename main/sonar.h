@@ -2,6 +2,7 @@
 #define SONAR_H_
 
 #include <Arduino.h>
+#include "MyNewPing.h"
 
 using namespace std;
 
@@ -9,13 +10,14 @@ class Sonar{
 
 public:
 	Sonar();
-	void setup(int trigPin, int echo2Pin);
+	void setup(uint8_t trigPin, uint8_t echo2Pin, unsigned int maxDistance);
 	int computeDistance();
 
 private:
+	NewPing sonar;
 	int trigPin;
 	int echoPin;
-	int duration;
+	// int duration;
 	int distance;
 };
 

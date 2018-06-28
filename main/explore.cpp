@@ -19,7 +19,7 @@ Explore::Explore(Controller* controller, unsigned long start){
   this->servo_last_millis = 0;
   this->music_last_millis = 0;
   this->led_last_millis = 0;
-  this->sonar_last_millis = 0;
+  this->sonar_last_millis = 500;
 
   this->isMotorSwapped = 1;
   this->isMotorStopped = 1;
@@ -75,6 +75,7 @@ void Explore::ledAction(){
 }
 
 void Explore::sonarAction(){
+  this->sonar_interval = 25;
   this->sonar_last_millis = millis();
   this->distance = controller->sonar->computeDistance();
   //the object is moving but not getting closer

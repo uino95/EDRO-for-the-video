@@ -30,9 +30,11 @@ void setup(){
    motor1->setup(23, 25, 12);
    led->setup(2,3,5);
    player->setup(10,9);
-   sonar->setup(33,31);  
+   sonar->setup(33,31, 200);  
 }
  
 void loop(){
+   //sonar->computeDistance();
+   //delay(25);
    controller.updateEmotion(millis());
 }

@@ -24,6 +24,7 @@ void Player::setup(int TX, int RX)
 void Player::play(int song){
   Serial.println("I'm playing the song");
   Serial.println(song);
+  myDFPlayer.volume(30);
 	myDFPlayer.play(song);
 }
 

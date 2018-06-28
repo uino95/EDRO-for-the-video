@@ -12,7 +12,7 @@ Joy::Joy(Controller* controller, unsigned long start){
   this->servo_interval = 350;
   this->motor_interval = 150;
   this->led_interval = 200;
-  this->sonar_interval = 500;
+  this->sonar_interval = 0;
   this->music_interval = 0;
 
   this->motor_last_millis = 0;
@@ -54,15 +54,15 @@ void Joy::servoAction(){
   //Serial.println(millis());
   if(isServoSwapped){
     this->servo_last_millis = millis();
-	  controller->servo[0]->move(20,40);
-	  controller->servo[1]->move(20,40);
-	  controller->servo[2]->move(20,40);
+	  controller->servo[0]->move(10,40);
+	  controller->servo[1]->move(10,40);
+	  controller->servo[2]->move(10,40);
     isServoSwapped = 0;
   } else {
     this->servo_last_millis = millis();
-    controller->servo[0]->move(60,40);
-    controller->servo[1]->move(60,40);
-    controller->servo[2]->move(60,40);
+    controller->servo[0]->move(50,40);
+    controller->servo[1]->move(50,40);
+    controller->servo[2]->move(50,40);
     isServoSwapped = 1;
   }
 }

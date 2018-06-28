@@ -10,7 +10,7 @@ Search::Search(Controller* controller, unsigned long start){
 	this->emotion_started = start;
 
   this->motor_interval = 50;
-  this->sonar_interval = 25;
+  this->sonar_interval = 2000;
   this->servo_interval = 0;
   this->led_interval = 0;
   this->music_interval = 0;
@@ -19,7 +19,7 @@ Search::Search(Controller* controller, unsigned long start){
   this->servo_last_millis = 0;
   this->music_last_millis = 0;
   this->led_last_millis = 0;
-  this->sonar_last_millis = 0;
+  this->sonar_last_millis = start;
 
   this->isMotorSwapped = 1;
 
@@ -100,6 +100,7 @@ void Search::ledAction(){
 }
 
 void Search::sonarAction(){
+  this->sonar_interval = 25;
   this->sonar_last_millis = millis();
   this->distance = controller->sonar->computeDistance();
   if(this->distance < this->threshold && this->distance > 0){
